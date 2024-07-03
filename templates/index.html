@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text to Speech</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        .container {
+            text-align: center;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .container input[type="text"] {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .container button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        .container button:hover {
+            background-color: #0056b3;
+        }
+        .container img, .container audio {
+            max-width: 100%;
+            margin-top: 20px;
+        }
+        .centered-element {
+            display: block;
+            margin: 20px auto; /* 上下保持20px的间距，左右自动调整以居中 */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Text to Speech with Tacotron2 and Griffin-Lim</h1>
+        <form id="text-form">
+            <input type="text" id="text-input" name="text" placeholder="Enter text here..." required>
+            <button type="submit">Generate</button>
+        </form>
+        <audio id="audio-player" controls class="centered-element" style="display: none;"></audio>
+        <img id="mel-image" class="centered-element" style="display: none;">
+    </div>
+
+    <script>
+        document.getElementById('text-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            fetch('/generate', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                const audioPlayer = document.getElementById('audio-player');
+                const melImage = document.getElementById('mel-image');
+                
+                audioPlayer.src = data.audio_path;
+                audioPlayer.style.display = 'block';
+                audioPlayer.play();
+                
+                melImage.src = data.mel_path;
+                melImage.style.display = 'block';
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>
